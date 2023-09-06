@@ -20,7 +20,7 @@ let sinceMinutes;
 let untilHours;
 let untilMinutes;
 
-const branch = "develop";
+let branch;
 
 const headers = {
   "Content-Type": "application/json",
@@ -32,6 +32,21 @@ const fetchParams = {
   method: "GET",
   headers,
 };
+
+function getISOFormattedDate({
+  day,
+  month = new Date().getMonth + 1,
+  hours,
+  minutes,
+}) {
+  const date = new Date();
+
+  date.setDate(day);
+  date.setMonth(month);
+  date.setHours(hours, minutes, 0, 0);
+
+  return date.toISOString();
+}
 
 function promptOwner() {
   return new Promise((resolve) => {
@@ -51,6 +66,19 @@ function promptOwner() {
   });
 }
 
+function promptUsername() {
+  return new Promise((resolve) => {
+    readline.question("Informe seu username do GitHub: ", (username) => {
+      if (!username)
+        throw new Error("Nome do usuário do GitHub não pode estar vazio");
+
+      ghUsername = username;
+
+      resolve();
+    });
+  });
+}
+
 function promptRepo() {
   return new Promise((resolve) => {
     readline.question(
@@ -67,16 +95,19 @@ function promptRepo() {
   });
 }
 
-function promptUsername() {
+function promptBranch() {
   return new Promise((resolve) => {
-    readline.question("Informe seu username do GitHub: ", (username) => {
-      if (!username)
-        throw new Error("Nome do usuário do GitHub não pode estar vazio");
+    readline.question(
+      "Informe o nome da branch que você quer retirar os commits (ex: main): ",
+      (promptBranch) => {
+        if (!promptBranch)
+          throw new Error("Nome da branch não pode estar vazio");
 
-      ghUsername = username;
+        branch = promptBranch;
 
-      resolve();
-    });
+        resolve();
+      }
+    );
   });
 }
 
@@ -157,8 +188,9 @@ function promptUntilTime() {
 
 async function setupInputInfo() {
   await promptOwner();
-  await promptRepo();
   await promptUsername();
+  await promptRepo();
+  await promptBranch();
   await promptDate();
   await promptSinceTime();
   await promptUntilTime();
@@ -168,13 +200,15 @@ async function setupInputInfo() {
 
 async function grabCommits() {
   const since = getISOFormattedDate({
-    day: 4,
+    day,
+    month,
     hours: sinceHours,
     minutes: sinceMinutes,
   });
 
   const until = getISOFormattedDate({
-    day: 4,
+    day,
+    month,
     hours: untilHours,
     minutes: untilMinutes,
   });
@@ -208,25 +242,10 @@ async function grabCommits() {
   });
 }
 
-function getISOFormattedDate({
-  day,
-  month = new Date().getMonth + 1,
-  year = 2023,
-  hours,
-  minutes,
-}) {
-  const date = new Date();
-
-  date.setDate(day);
-  date.setHours(hours, minutes, 0, 0);
-
-  return date.toISOString();
-}
-
 async function execute() {
   try {
     await setupInputInfo();
-    // await grabCommits();
+    await grabCommits();
   } catch (error) {
     console.log("Erro:", error);
   }
