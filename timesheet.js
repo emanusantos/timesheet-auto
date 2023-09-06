@@ -1,10 +1,15 @@
 const fs = require("fs");
 
+const readline = require("readline").createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
 const ghApiKey = process.env.GITHUB_API_KEY;
 
-const owner = "lubysoftware";
-const repo = "Conciliacao.admin";
-const ghUsername = "emanusantos";
+let owner;
+let repo;
+let ghUsername;
 
 const day = 4;
 const sinceHours = 7;
@@ -38,36 +43,87 @@ const fetchParams = {
   headers,
 };
 
-async function execute() {
-  try {
-    const response = await fetch(url, fetchParams);
+function promptOwner() {
+  return new Promise((resolve) => {
+    readline.question(
+      "Informe o username do dono do repositório (ex: lubysoftware): ",
+      (username) => {
+        if (!username)
+          throw new Error(
+            "Username do dono do repositório não pode estar vazio"
+          );
 
-    if (!response.ok) {
-      const err = await response.text();
+        owner = username;
 
-      throw new Error(err);
-    }
+        resolve();
+      }
+    );
+  });
+}
 
-    const commits = await response.json();
+function promptRepo() {
+  return new Promise((resolve) => {
+    readline.question(
+      "Informe o nome do repositório exatamente como está na url do GitHub: ",
+      (repository) => {
+        if (!repository)
+          throw new Error("Nome do repositório não pode estar vazio");
 
-    const stream = fs.createWriteStream("output.txt");
+        repo = repository;
 
-    stream.once("open", () => {
-      commits.forEach((commit) => {
-        stream.write(`- ${commit.commit.message}\n`);
-      });
+        resolve();
+      }
+    );
+  });
+}
 
-      stream.write("\n\ncommits:\n");
+function promptUsername() {
+  return new Promise((resolve) => {
+    readline.question("Informe seu username do GitHub: ", (username) => {
+      if (!username)
+        throw new Error("Nome do usuário do GitHub não pode estar vazio");
 
-      commits.forEach((commit) => {
-        stream.write(`${commit.html_url};\n`);
-      });
+      ghUsername = username;
 
-      stream.end();
+      resolve();
     });
-  } catch (error) {
-    console.log({ error });
+  });
+}
+
+async function setupInputInfo() {
+  await promptOwner();
+  await promptRepo();
+  await promptUsername();
+
+  readline.close();
+}
+
+async function grabCommits() {
+  const response = await fetch(url, fetchParams);
+
+  if (!response.ok) {
+    const err = await response.text();
+
+    throw new Error(err);
   }
+
+  const commits = await response.json();
+
+  const stream = fs.createWriteStream("output.txt");
+
+  stream.once("open", () => {
+    commits.forEach((commit) => {
+      stream.write(`- ${commit.commit.message}\n`);
+    });
+
+    stream.write("\n\ncommits:\n");
+
+    commits.forEach((commit) => {
+      stream.write(`${commit.html_url};\n`);
+    });
+
+    stream.end();
+  });
 }
 
 function getISOFormattedDate({
@@ -83,6 +139,15 @@ function getISOFormattedDate({
   date.setHours(hours, minutes, 0, 0);
 
   return date.toISOString();
+}
+
+async function execute() {
+  try {
+    await setupInputInfo();
+    // await grabCommits();
+  } catch (error) {
+    console.log("Erro:", error);
+  }
 }
 
 execute();
