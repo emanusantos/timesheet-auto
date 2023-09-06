@@ -1,8 +1,9 @@
 const fs = require("fs");
 
+const ghApiKey = process.env.GITHUB_API_KEY;
+
 const owner = "lubysoftware";
 const repo = "Conciliacao.admin";
-const ghApiKey = process.env.GITHUB_API_KEY;
 const ghUsername = "emanusantos";
 
 const day = 4;
