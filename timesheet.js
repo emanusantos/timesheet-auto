@@ -7,9 +7,9 @@ const readline = require("readline").createInterface({
 
 const ghApiKey = process.env.GITHUB_API_KEY;
 
-let owner;
+let owner = "lubysoftware";
 let repo;
-let ghUsername;
+let ghUsername = "emanusantos";
 
 let day;
 let month;
@@ -187,8 +187,8 @@ function promptUntilTime() {
 }
 
 async function setupInputInfo() {
-  await promptOwner();
-  await promptUsername();
+  // await promptOwner();
+  // await promptUsername();
   await promptRepo();
   await promptBranch();
   await promptDate();
@@ -246,6 +246,8 @@ async function execute() {
   try {
     await setupInputInfo();
     await grabCommits();
+
+    console.log("Relatório gerado com sucesso no arquivo output.txt");
   } catch (error) {
     console.log("Erro:", error);
   }
