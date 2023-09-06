@@ -11,26 +11,16 @@ let owner;
 let repo;
 let ghUsername;
 
-const day = 4;
-const sinceHours = 7;
-const sinceMinutes = 50;
-const since = getISOFormattedDate({
-  day: 4,
-  hours: sinceHours,
-  minutes: sinceMinutes,
-});
+let day;
+let month;
 
-const untilHours = 13;
-const untilMinutes = 30;
-const until = getISOFormattedDate({
-  day: 4,
-  hours: untilHours,
-  minutes: untilMinutes,
-});
+let sinceHours;
+let sinceMinutes;
+
+let untilHours;
+let untilMinutes;
 
 const branch = "develop";
-
-const url = `https://api.github.com/repos/${owner}/${repo}/commits?author=${ghUsername}&sha=${branch}&since=${since}&until=${until}`;
 
 const headers = {
   "Content-Type": "application/json",
@@ -90,15 +80,107 @@ function promptUsername() {
   });
 }
 
+function promptDate() {
+  return new Promise((resolve) => {
+    readline.question(
+      "Informe a data dos commits (formato DD/MM): ",
+      (date) => {
+        if (!date || !date.split("/")[0] || !date.split("/")[1])
+          throw new Error("Data não informada ou inválida");
+
+        const [inputDay, inputMonth] = date.split("/");
+
+        const numericInputDay = Number(inputDay);
+        const numericInputMonth = Number(inputMonth);
+
+        if (isNaN(numericInputDay) || isNaN(numericInputMonth))
+          throw new Error("A data informada é inválida");
+
+        day = numericInputDay;
+        month = numericInputMonth - 1;
+
+        resolve();
+      }
+    );
+  });
+}
+
+function promptSinceTime() {
+  return new Promise((resolve) => {
+    readline.question(
+      "Informe o horário do começo dos commits (formato HH:MM): ",
+      (time) => {
+        if (!time || !time.split(":")[0] || !time.split(":")[1])
+          throw new Error("Horário não informado ou inválido");
+
+        const [inputHour, inputMinutes] = time.split(":");
+
+        const numericInputHour = Number(inputHour);
+        const numericInputMinutes = Number(inputMinutes);
+
+        if (isNaN(numericInputHour) || isNaN(numericInputMinutes))
+          throw new Error("O horário informado é inválido");
+
+        sinceHours = numericInputHour;
+        sinceMinutes = numericInputMinutes;
+
+        resolve();
+      }
+    );
+  });
+}
+
+function promptUntilTime() {
+  return new Promise((resolve) => {
+    readline.question(
+      "Informe o horário de término dos commits (formato HH:MM): ",
+      (time) => {
+        if (!time || !time.split(":")[0] || !time.split(":")[1])
+          throw new Error("Horário não informado ou inválido");
+
+        const [inputHour, inputMinutes] = time.split(":");
+
+        const numericInputHour = Number(inputHour);
+        const numericInputMinutes = Number(inputMinutes);
+
+        if (isNaN(numericInputHour) || isNaN(numericInputMinutes))
+          throw new Error("O horário informado é inválido");
+
+        untilHours = numericInputHour;
+        untilMinutes = numericInputMinutes;
+
+        resolve();
+      }
+    );
+  });
+}
+
 async function setupInputInfo() {
   await promptOwner();
   await promptRepo();
   await promptUsername();
+  await promptDate();
+  await promptSinceTime();
+  await promptUntilTime();
 
   readline.close();
 }
 
 async function grabCommits() {
+  const since = getISOFormattedDate({
+    day: 4,
+    hours: sinceHours,
+    minutes: sinceMinutes,
+  });
+
+  const until = getISOFormattedDate({
+    day: 4,
+    hours: untilHours,
+    minutes: untilMinutes,
+  });
+
+  const url = `https://api.github.com/repos/${owner}/${repo}/commits?author=${ghUsername}&sha=${branch}&since=${since}&until=${until}`;
+
   const response = await fetch(url, fetchParams);
 
   if (!response.ok) {
