@@ -187,8 +187,8 @@ function promptUntilTime() {
 }
 
 async function setupInputInfo() {
-  // await promptOwner();
-  // await promptUsername();
+  await promptOwner();
+  await promptUsername();
   await promptRepo();
   await promptBranch();
   await promptDate();
