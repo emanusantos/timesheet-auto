@@ -225,6 +225,10 @@ async function grabCommits() {
 
   const commits = await response.json();
 
+  await new Promise((res) => {
+    fs.unlink("output.txt", res);
+  });
+
   const stream = fs.createWriteStream("output.txt");
 
   stream.once("open", () => {
