@@ -10,10 +10,10 @@ O script é feito mediante consulta à API do GitHub.
 
 ## Como usar
 
-Para rodar o projeto, basta clonar o repositório na sua máquina e rodar o comando:
+Para rodar o script, basta rodar o comando:
 
 ```bash
-$ npx timesheet --key="seu token de acesso aqui"
+$ npx timesheet-auto --key="seu token de acesso aqui"
 ```
 
 Após rodar o comando, serão promptados os seguintes requisitos no seu terminal:
@@ -22,8 +22,9 @@ Após rodar o comando, serão promptados os seguintes requisitos no seu terminal
 - O seu nome de usuário do GitHub;
 - O repositório que você quer buscar os commits;
 - A branch que você quer buscar os commits;
-- O horário de começo do intervalo de início dos commits;
-- O horário final do intervalo dos commits.
+- A data dos commits;
+- O horário de começo do intervalo de início dos commits (opcional);
+- O horário final do intervalo dos commits (opcional).
 
-Preenchendo todos os requisitos de forma válida, será gerado um arquivo "output.txt" na pasta raiz da aplicação
-contendo os commits que pertencem ao intervalo de horário especificado.
+Preenchendo todos os requisitos de forma válida, será gerado um arquivo "output.txt" na pasta raiz de onde o comando foi executado,
+contendo os commits que pertencem à data e horário especificado.
