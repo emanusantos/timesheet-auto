@@ -1,0 +1,15 @@
+{
+  "name": "timesheet",
+  "version": "1.0.0",
+  "description": "Ferramenta para automatização de busca de commits por data e intervalo de horário, para facilitar o processo de apontamentos no timesheet. O script é feito mediante consulta à API do GitHub.",
+  "main": "timesheet.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "timesheet": "bin/timesheet.js"
+  }
+}

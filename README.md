@@ -13,16 +13,17 @@ O script é feito mediante consulta à API do GitHub.
 Para rodar o projeto, basta clonar o repositório na sua máquina e rodar o comando:
 
 ```bash
-$ GITHUB_API_KEY="seu token de acesso aqui" node timesheet.js
+$ npx timesheet --key="seu token de acesso aqui"
 ```
 
 Após rodar o comando, serão promptados os seguintes requisitos no seu terminal:
-  - O nome de usuário do GitHub do dono do repositório que você quer buscar os commits;
-  - O seu nome de usuário do GitHub;
-  - O repositório que você quer buscar os commits;
-  - A branch que você quer buscar os commits;
-  - O horário de começo do intervalo de início dos commits;
-  - O horário final do intervalo dos commits.
+
+- O nome de usuário do GitHub do dono do repositório que você quer buscar os commits;
+- O seu nome de usuário do GitHub;
+- O repositório que você quer buscar os commits;
+- A branch que você quer buscar os commits;
+- O horário de começo do intervalo de início dos commits;
+- O horário final do intervalo dos commits.
 
 Preenchendo todos os requisitos de forma válida, será gerado um arquivo "output.txt" na pasta raiz da aplicação
 contendo os commits que pertencem ao intervalo de horário especificado.

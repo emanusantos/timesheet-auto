@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 const fs = require("fs");
 
 const readline = require("readline").createInterface({
@@ -5,7 +7,7 @@ const readline = require("readline").createInterface({
   output: process.stdout,
 });
 
-const ghApiKey = process.env.GITHUB_API_KEY;
+let ghApiKey;
 
 let owner = "lubysoftware";
 let repo;
@@ -22,16 +24,20 @@ let untilMinutes;
 
 let branch;
 
-const headers = {
-  "Content-Type": "application/json",
-  "User-Agent": ghUsername,
-  Authorization: `Bearer ${ghApiKey}`,
-};
+function verifyGHKey() {
+  const args = process.argv;
 
-const fetchParams = {
-  method: "GET",
-  headers,
-};
+  if (args.length < 3) throw new Error("API key do GitHub não informada");
+
+  if (!args[2].startsWith("--key"))
+    throw new Error(`Argumento inválido: ${args[2]}`);
+
+  const providedKey = args[2].split("=")[1];
+
+  if (!providedKey) throw new Error("API key do GitHub não informada");
+
+  ghApiKey = providedKey;
+}
 
 function getISOFormattedDate({
   day,
@@ -215,6 +221,17 @@ async function grabCommits() {
 
   const url = `https://api.github.com/repos/${owner}/${repo}/commits?author=${ghUsername}&sha=${branch}&since=${since}&until=${until}`;
 
+  const headers = {
+    "Content-Type": "application/json",
+    "User-Agent": ghUsername,
+    Authorization: `Bearer ${ghApiKey}`,
+  };
+
+  const fetchParams = {
+    method: "GET",
+    headers,
+  };
+
   const response = await fetch(url, fetchParams);
 
   if (!response.ok) {
@@ -248,12 +265,14 @@ async function grabCommits() {
 
 async function execute() {
   try {
+    verifyGHKey();
     await setupInputInfo();
     await grabCommits();
 
     console.log("Relatório gerado com sucesso no arquivo output.txt");
   } catch (error) {
-    console.log("Erro:", error);
+    readline.close();
+    console.log(error);
   }
 }
 
