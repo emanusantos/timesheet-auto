@@ -42,8 +42,8 @@ function verifyGHKey() {
 function getISOFormattedDate({
   day,
   month = new Date().getMonth + 1,
-  hours,
-  minutes,
+  hours = 0,
+  minutes = 0,
 }) {
   const date = new Date();
 
@@ -145,10 +145,12 @@ function promptDate() {
 function promptSinceTime() {
   return new Promise((resolve) => {
     readline.question(
-      "Informe o horário do começo dos commits (formato HH:MM): ",
+      "Informe o horário do começo dos commits (opcional, formato HH:MM): ",
       (time) => {
-        if (!time || !time.split(":")[0] || !time.split(":")[1])
-          throw new Error("Horário não informado ou inválido");
+        if (!time) return resolve();
+
+        if (!time.split(":")[0] || !time.split(":")[1])
+          throw new Error("O horário informado é inválido");
 
         const [inputHour, inputMinutes] = time.split(":");
 
@@ -170,10 +172,12 @@ function promptSinceTime() {
 function promptUntilTime() {
   return new Promise((resolve) => {
     readline.question(
-      "Informe o horário de término dos commits (formato HH:MM): ",
+      "Informe o horário de término dos commits (opcional, formato HH:MM): ",
       (time) => {
-        if (!time || !time.split(":")[0] || !time.split(":")[1])
-          throw new Error("Horário não informado ou inválido");
+        if (!time) return resolve();
+
+        if (!time.split(":")[0] || !time.split(":")[1])
+          throw new Error("O horário informado é inválido");
 
         const [inputHour, inputMinutes] = time.split(":");
 
@@ -215,8 +219,8 @@ async function grabCommits() {
   const until = getISOFormattedDate({
     day,
     month,
-    hours: untilHours,
-    minutes: untilMinutes,
+    hours: untilHours ?? 23,
+    minutes: untilMinutes ?? 59,
   });
 
   const url = `https://api.github.com/repos/${owner}/${repo}/commits?author=${ghUsername}&sha=${branch}&since=${since}&until=${until}`;
