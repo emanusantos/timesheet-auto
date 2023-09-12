@@ -266,9 +266,6 @@ async function grabCommits() {
 async function execute() {
   try {
     verifyGHKey();
-
-    return;
-
     await setupInputInfo();
     await grabCommits();
 
